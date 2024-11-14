@@ -1,0 +1,40 @@
+@startuml main
+start
+:Generate parameter files;
+:Prepare job array script;
+:Prepare single job script;
+:Submit job array;
+fork
+partition #lightBlue "Node1"
+fork
+partition #lightGreen "DMRG Loop 1"
+:load data, including prior runs;
+:prepare calculation;
+while(ΔE_pred big, and time limit or bond dimension limit not reached) is (true)
+:Choose new bond dimension;
+:Perform a single run of the DMRG algorithm;
+:Save data to HDF5 file;
+:Perform the extrapolation;
+endwhile
+:plot results;
+end group
+fork again
+partition #lightGreen "DMRG Loop X"
+:DMRG loop;
+end group
+end merge
+:Collect HDF5s, plots, and logs and Zip them;
+:Move data to scratch;
+:Move data to home folder;
+end group
+fork again
+partition #lightBlue "Node2"
+:Other DMRG loops;
+:Collect HDF5s, plots, and logs and Zip them;
+:Move data to scratch;
+:Move data to home folder;
+end group
+end fork
+end
+@enduml
+
